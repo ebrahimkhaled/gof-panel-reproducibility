@@ -1,0 +1,95 @@
+
+=============================== n = 500 =============================== 
+cells: conformal null 2000 | train null 200, 12 train alts x 200 | test null 2000, test alts x 1000 
+non-finite FEATS11 entries: conformal 0, train(all) 0, test(all) 0 
+
+--- HELD-OUT (test_*) RESULTS, n = 500, alpha = 0.05, probit excluded --- 
+                             Method   Size mean_ALT11 worst_ALT11 oracle_gap
+1               NNCauchy (SELECTED) 0.0535     0.6863       0.081     0.0405
+2    CCT-full (equal wt, conformal) 0.0445     0.6817       0.096     0.0451
+3 CCT-full (official classical row) 0.0600     0.6816       0.095     0.0452
+4   C+A.ridge(HO) (shipped learned) 0.0530     0.6476       0.073     0.0792
+5    ORACLE (hindsight best single)     NA     0.7268       0.170     0.0000
+
+per-family: 
+                             Method  quad quad2 cubic cloglog probit  bump
+1               NNCauchy (SELECTED) 0.985 0.970 0.081   0.171  0.030 0.273
+2    CCT-full (equal wt, conformal) 0.975 0.930 0.096   0.226  0.043 0.259
+3 CCT-full (official classical row) 0.975 0.930 0.095   0.226  0.043 0.259
+4   C+A.ridge(HO) (shipped learned) 0.994 0.816 0.073   0.261  0.031 0.242
+5    ORACLE (hindsight best single) 0.992 0.985 0.170   0.428  0.061 0.254
+   sine  step interaction mixed multivar_quad multivar_int
+1 0.983 0.226       0.985 0.997         0.912        0.966
+2 0.980 0.234       0.969 0.991         0.892        0.947
+3 0.980 0.234       0.969 0.991         0.892        0.947
+4 0.924 0.253       0.977 0.984         0.914        0.686
+5 0.988 0.280       0.992 0.999         0.921        0.986
+
+paired over the 11 held-out families: 
+  NNCauchy - CCT-full : mean +0.0045  se 0.0074  t +0.61  up 8 / down 3 / tie 0 
+  NNCauchy - C+A.ridge: mean +0.0386  se 0.0301  t +1.29  up 7 / down 4 / tie 0 
+  per-family MC se of a single power estimate ~ 0.0158 (1000 reps) 
+  CERTIFICATE gamma=0 == CCT-full : max |power diff| = 0.000e+00 
+  official-row vs conformal CCT-full: max |power diff| = 0.0010 
+
+=============================== n = 1000 =============================== 
+cells: conformal null 2000 | train null 200, 12 train alts x 200 | test null 2000, test alts x 1000 
+non-finite FEATS11 entries: conformal 0, train(all) 0, test(all) 0 
+
+--- HELD-OUT (test_*) RESULTS, n = 1000, alpha = 0.05, probit excluded --- 
+                             Method   Size mean_ALT11 worst_ALT11 oracle_gap
+1               NNCauchy (SELECTED) 0.0483     0.8083       0.231     0.0181
+2    CCT-full (equal wt, conformal) 0.0475     0.8088       0.231     0.0175
+3 CCT-full (official classical row) 0.0520     0.8083       0.230     0.0181
+4   C+A.ridge(HO) (shipped learned) 0.0631     0.7995       0.261     0.0269
+5    ORACLE (hindsight best single)     NA     0.8264       0.310     0.0000
+
+per-family: 
+                             Method quad quad2 cubic cloglog probit  bump sine
+1               NNCauchy (SELECTED)    1 1.000 0.231   0.570  0.061 0.566    1
+2    CCT-full (equal wt, conformal)    1 1.000 0.231   0.570  0.061 0.566    1
+3 CCT-full (official classical row)    1 1.000 0.230   0.569  0.060 0.565    1
+4   C+A.ridge(HO) (shipped learned)    1 0.996 0.261   0.524  0.052 0.616    1
+5    ORACLE (hindsight best single)    1 1.000 0.310   0.706  0.078 0.535    1
+   step interaction mixed multivar_quad multivar_int
+1 0.524           1     1             1        1.000
+2 0.530           1     1             1        1.000
+3 0.527           1     1             1        1.000
+4 0.513           1     1             1        0.884
+5 0.539           1     1             1        1.000
+
+paired over the 11 held-out families: 
+  NNCauchy - CCT-full : mean -0.0005  se 0.0005  t -1.00  up 0 / down 1 / tie 10 
+  NNCauchy - C+A.ridge: mean +0.0088  se 0.0129  t +0.68  up 4 / down 2 / tie 5 
+  per-family MC se of a single power estimate ~ 0.0158 (1000 reps) 
+  CERTIFICATE gamma=0 == CCT-full : max |power diff| = 0.000e+00 
+  official-row vs conformal CCT-full: max |power diff| = 0.0030 
+
+--- selected (gamma, agg) per production fold --- 
+      n          fold gamma  agg w_max_feature      w_max
+1   500          quad  3.00 mean      A.spline 0.23157807
+2   500         quad2  5.00 mean           Xie 0.24108333
+3   500         cubic  3.00 mean        A.poly 0.23243182
+4   500       cloglog  3.00 mean      A.spline 0.23066031
+5   500        probit  3.00 mean        A.poly 0.22970229
+6   500          bump  3.00 mean        A.poly 0.23738382
+7   500          sine  3.00 mean        A.poly 0.29528872
+8   500          step  3.00 mean        A.poly 0.23712506
+9   500   interaction  3.00 mean      A.spline 0.22666785
+10  500         mixed  5.00 mean      A.spline 0.26124893
+11  500 multivar_quad  2.00 mean           Xie 0.18618528
+12  500  multivar_int  5.00 mean      A.spline 0.39594947
+13 1000          quad  0.00 mean            HL 0.09090909
+14 1000         quad2  3.00  min     DEF.poly3 0.41017805
+15 1000         cubic  0.00 mean            HL 0.09090909
+16 1000       cloglog  0.00 mean            HL 0.09090909
+17 1000        probit  0.00 mean            HL 0.09090909
+18 1000          bump  0.00 mean            HL 0.09090909
+19 1000          sine  0.00 mean            HL 0.09090909
+20 1000          step  0.25 mean           Xie 0.09830746
+21 1000   interaction  0.00 mean            HL 0.09090909
+22 1000         mixed  0.00 mean            HL 0.09090909
+23 1000 multivar_quad  0.00 mean            HL 0.09090909
+24 1000  multivar_int  0.00 mean            HL 0.09090909
+
+DONE. 

@@ -1,0 +1,2 @@
+null n=500: HL, HL-equalwidth, Pigeon-Heyse, EF | Tsiatis, Xie | DEF.poly2, DEF.poly3, DEF.stukel, Stukel | Osius-Rojek | le-Cessie, A.poly, A.spline
+null n=1000: HL, HL-equalwidth, Pigeon-Heyse, EF | Tsiatis, Xie | DEF.poly2, DEF.poly3, DEF.stukel, Stukel | Osius-Rojek | le-Cessie, A.poly, A.spline

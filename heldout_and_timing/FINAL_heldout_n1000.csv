@@ -1,0 +1,6 @@
+"Method","n","Size","quad","quad2","cubic","cloglog","probit","bump","sine","step","interaction","mixed","multivar_quad","multivar_int","mean_ALT11","worst_ALT11","oracle_gap"
+"NNCauchy (SELECTED)",1000,0.0483,1,1,0.231,0.57,0.061,0.566,1,0.524,1,1,1,1,0.8083,0.231,0.0181
+"CCT-full (equal wt, conformal)",1000,0.0475,1,1,0.231,0.57,0.061,0.566,1,0.53,1,1,1,1,0.8088,0.231,0.0175
+"CCT-full (official classical row)",1000,0.052,1,1,0.23,0.569,0.06,0.565,1,0.527,1,1,1,1,0.8083,0.23,0.0181
+"C+A.ridge(HO) (shipped learned)",1000,0.0631,1,0.996,0.261,0.524,0.052,0.616,1,0.513,1,1,1,0.884,0.7995,0.261,0.0269
+"ORACLE (hindsight best single)",1000,NA,1,1,0.31,0.706,0.078,0.535,1,0.539,1,1,1,1,0.8264,0.31,0

@@ -1,6 +1,7 @@
 """make_tables.py -- writes every table of the panel paper as a LaTeX fragment in paper/tables/, straight from the result
 files. No number in the manuscript tables is typed by hand; re-run this after any change to the results."""
 import os
+from decimal import Decimal, ROUND_HALF_UP
 import numpy as np
 import pandas as pd
 
@@ -8,7 +9,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "tables")
 os.makedirs(OUT, exist_ok=True)
 R = lambda f: pd.read_csv(os.path.join(HERE, f))
-f3 = lambda x: f"{x:.3f}"
+# one rounding rule everywhere: half up on the decimal value, so 0.0455 prints as 0.046 (f"{x:.3f}" rounds the binary value)
+f3 = lambda x: str(Decimal(repr(float(x))).quantize(Decimal("0.001"), rounding=ROUND_HALF_UP))
 PANEL_NAME = {"CLASSIC": "Classical (6)", "FULL": "Full (14)", "ONE-PER-GROUP": "One per group (5)",
               "PROTECTED": "Protected (4)", "LEARNED-ROBUST": "Screened (7 or 8)"}
 TEST_NAME = {"HL": "Hosmer--Lemeshow", "HL-equalwidth": "HL, equal-width groups", "Pigeon-Heyse": "Pigeon--Heyse",
@@ -120,7 +122,7 @@ if os.path.exists(os.path.join(HERE, "result5_power.csv")):
     S5, P5, D5 = R("result5_size.csv"), R("result5_power.csv"), R("result5_diff.csv")
     RULE_NAME = {"Cauchy": "Cauchy", "HMP": "Harmonic mean $p$", "minP": "Minimum $p$", "Fisher": "Fisher",
                  "Stouffer": "Stouffer", "Quadratic": "Quadratic $z^\\top S^{-1}z$", "Bonferroni": "Bonferroni (not calibrated)"}
-    pts = lambda x: f"{100 * x:+.1f}".replace("-", "$-$")
+    pts = lambda x: ("+" if x >= 0 else "$-$") + str(Decimal(repr(abs(100 * float(x)))).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP))
     rows = []
     for p in ["CLASSIC", "FULL"]:
         rows.append(f"\\multicolumn{{7}}{{l}}{{\\emph{{{PANEL_NAME[p]}}}}} \\\\")
@@ -143,6 +145,25 @@ if os.path.exists(os.path.join(HERE, "result5_power.csv")):
         "\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}",
         "Rule & Size & Power & Difference (95\\% CI) & Size & Power & Difference (95\\% CI) \\\\", "\\midrule",
         *rows[:-1], "\\bottomrule", "\\end{tabular}"]))
+# ---- Table: power of each panel alternative by alternative (cost of the protected panel) --------------------------------
+if os.path.exists(os.path.join(HERE, "result4_power.csv")):
+    W4 = R("result4_power.csv")
+    cols = ["FULL", "ONE-PER-GROUP", "PROTECTED", "LEARNED-ROBUST"]
+    piv = {n: W4[W4.n == n].pivot(index="family", columns="panel", values="power") for n in [500, 1000]}
+    fams = piv[500].assign(loss=piv[500].FULL - piv[500].PROTECTED).sort_values("loss", ascending=False).index
+    rows = []
+    for f in fams:
+        cells = [f3(piv[n].loc[f, c]) for n in [500, 1000] for c in cols]
+        rows.append(f"\\texttt{{{f.replace('_', chr(92) + '_')}}} & " + " & ".join(cells) + " \\\\")
+    rows.append("\\midrule")
+    rows.append("Average & " + " & ".join(f3(piv[n][c].mean()) for n in [500, 1000] for c in cols) + " \\\\")
+    short = {"FULL": "Full", "ONE-PER-GROUP": "One/group", "PROTECTED": "Protected", "LEARNED-ROBUST": "Screened"}
+    write("tab_panel_power.tex", "\n".join([
+        "\\begin{tabular}{lcccccccc}", "\\toprule",
+        " & \\multicolumn{4}{c}{$n=500$} & \\multicolumn{4}{c}{$n=1000$} \\\\", "\\cmidrule(lr){2-5}\\cmidrule(lr){6-9}",
+        "Alternative & " + " & ".join(short[c] for _ in range(2) for c in cols) + " \\\\", "\\midrule",
+        *rows, "\\bottomrule", "\\end{tabular}"]))
+
 # ---- Tables: the extra simulations of run_extra.R (result6_extra.py) ----------------------------------------------------
 if os.path.exists(os.path.join(HERE, "result6_designs.csv")):
     C6, D6 = R("result6_corrupt.csv"), R("result6_designs.csv")
@@ -175,19 +196,38 @@ if os.path.exists(os.path.join(HERE, "result6_designs.csv")):
         "\\midrule", *rows, "\\bottomrule", "\\end{tabular}"]))
     # bootstrap calibration: size of four rules on two panels, and power against the fixed reference calibration
     RN = {"cauchy": "Cauchy", "hmp": "Harmonic mean $p$", "fisher": "Fisher", "minp": "Minimum $p$"}
+    # size in four settings: the original design at n = 200 and 500 (run_extra.R) and the two other designs at n = 200
+    # (run_extra2.R, result7_extra2.py)
+    BD7 = R("result7_boot_designs.csv") if os.path.exists(os.path.join(HERE, "result7_boot_designs.csv")) else None
+    def boot_size(setting, rule):
+        if setting.startswith("orig"):
+            return BS6[(BS6.n == int(setting[4:])) & (BS6.rule == rule)]["size"].iloc[0]
+        return BD7[(BD7.design == setting) & (BD7.rule == rule)]["size"].iloc[0]
+    settings = ["orig200", "orig500"] + (["rare", "six"] if BD7 is not None else [])
+    heads = {"orig200": "$n=200$", "orig500": "$n=500$", "rare": "Rare, 200", "six": "Six cov., 200"}
     rows = []
-    for rule in RN:
-        cells = [f3(BS6[(BS6.n == n) & (BS6.rule == f"{p}_{rule}")]["size"].iloc[0]) for p in ["classic", "full"] for n in [200, 500]]
-        rows.append(RN[rule] + " & " + " & ".join(cells) + " \\\\")
+    for p in ["classic", "full"]:
+        rows.append(f"\\multicolumn{{{len(settings) + 1}}}{{l}}{{\\emph{{{PANEL_NAME[p.upper()]}}}}} \\\\")
+        for rule in RN:
+            rows.append(RN[rule] + " & " + " & ".join(f3(boot_size(st, f"{p}_{rule}")) for st in settings) + " \\\\")
     write("tab_boot_size.tex", "\n".join([
-        "\\begin{tabular}{lcccc}", "\\toprule",
-        " & \\multicolumn{2}{c}{Classical (6)} & \\multicolumn{2}{c}{Full (14)} \\\\", "\\cmidrule(lr){2-3}\\cmidrule(lr){4-5}",
-        "Rule & $n=200$ & $n=500$ & $n=200$ & $n=500$ \\\\", "\\midrule", *rows, "\\bottomrule", "\\end{tabular}"]))
-    ALT_NAME = {"quad": "Missing quadratic term", "cloglog": "Wrong link (complementary log-log)", "interaction": "Missing interaction"}
-    rows = [f"{ALT_NAME[r.alternative]} & {PANEL_NAME[r.panel]} & {f3(r.power_bootstrap)} & {f3(r.power_fixed_reference)} & "
-            f"{f3(r.agree)} \\\\" for _, r in BP6.iterrows()]
+        "\\begin{tabular}{l" + "c" * len(settings) + "}", "\\toprule",
+        " & \\multicolumn{2}{c}{Original design}" + (" & \\multicolumn{2}{c}{Other designs}" if BD7 is not None else "") + " \\\\",
+        "\\cmidrule(lr){2-3}" + ("\\cmidrule(lr){4-5}" if BD7 is not None else ""),
+        "Rule & " + " & ".join(heads[st] for st in settings) + " \\\\", "\\midrule", *rows, "\\bottomrule", "\\end{tabular}"]))
+    # power: the two calibrations on the same alternative data sets, as a paired comparison
+    ALT_NAME = {"quad": "Missing $x_1^2$ term", "quad2": "Missing $x_2^2$ term", "cloglog": "Wrong link (cloglog)",
+                "interaction": "Missing interaction"}
+    BE7 = R("result7_boot_paired.csv")
+    rows = []
+    for (n, B), g in BE7.groupby(["n", "B"], sort=True):
+        rows.append(f"\\multicolumn{{7}}{{l}}{{\\emph{{$n={n}$, $B={B}$, {g.reps.iloc[0]} data sets per alternative}}}} \\\\")
+        for _, r in g.iterrows():
+            rows.append(f"{ALT_NAME[r.alternative]} & {PANEL_NAME[r.panel]} & {f3(r.power_bootstrap)} & {f3(r.power_fixed)} & "
+                        f"{int(r.bootstrap_only)} & {int(r.fixed_only)} & {pts(r['diff'])} ({pts(r.lo)}, {pts(r.hi)}) \\\\")
     write("tab_boot_power.tex", "\n".join([
-        "\\begin{tabular}{llccc}", "\\toprule",
-        "Alternative & Panel & Bootstrap & Fixed reference & Same decision \\\\", "\\midrule",
+        "\\begin{tabular}{llccccl}", "\\toprule",
+        " & & \\multicolumn{2}{c}{Power} & \\multicolumn{2}{c}{Rejected only by} & \\\\", "\\cmidrule(lr){3-4}\\cmidrule(lr){5-6}",
+        "Alternative & Panel & Bootstrap & Fixed & bootstrap & fixed & Difference (95\\% CI) \\\\", "\\midrule",
         *rows, "\\bottomrule", "\\end{tabular}"]))
 print("tables written to", OUT, ":", sorted(os.listdir(OUT)))

@@ -1,12 +1,22 @@
-\begin{tabular}{llccc}
+\begin{tabular}{llccccl}
 \toprule
-Alternative & Panel & Bootstrap & Fixed reference & Same decision \\
+ & & \multicolumn{2}{c}{Power} & \multicolumn{2}{c}{Rejected only by} & \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+Alternative & Panel & Bootstrap & Fixed & bootstrap & fixed & Difference (95\% CI) \\
 \midrule
-Missing quadratic term & Full (14) & 0.960 & 0.970 & 0.970 \\
-Missing quadratic term & Classical (6) & 0.960 & 0.955 & 0.985 \\
-Wrong link (complementary log-log) & Full (14) & 0.270 & 0.280 & 0.960 \\
-Wrong link (complementary log-log) & Classical (6) & 0.265 & 0.265 & 0.940 \\
-Missing interaction & Full (14) & 0.945 & 0.975 & 0.970 \\
-Missing interaction & Classical (6) & 0.945 & 0.960 & 0.965 \\
+\multicolumn{7}{l}{\emph{$n=200$, $B=199$, 300 data sets per alternative}} \\
+Missing $x_1^2$ term & Full (14) & 0.453 & 0.500 & 7 & 21 & $-$4.7 ($-$8.1, $-$1.2) \\
+Missing $x_1^2$ term & Classical (6) & 0.477 & 0.497 & 4 & 10 & $-$2.0 ($-$4.4, +0.4) \\
+Missing interaction & Full (14) & 0.563 & 0.593 & 3 & 12 & $-$3.0 ($-$5.5, $-$0.5) \\
+Missing interaction & Classical (6) & 0.530 & 0.563 & 4 & 14 & $-$3.3 ($-$6.1, $-$0.6) \\
+Missing $x_2^2$ term & Full (14) & 0.423 & 0.443 & 6 & 12 & $-$2.0 ($-$4.8, +0.8) \\
+Missing $x_2^2$ term & Classical (6) & 0.377 & 0.387 & 4 & 7 & $-$1.0 ($-$3.2, +1.2) \\
+\multicolumn{7}{l}{\emph{$n=500$, $B=99$, 200 data sets per alternative}} \\
+Missing $x_1^2$ term & Full (14) & 0.960 & 0.970 & 2 & 4 & $-$1.0 ($-$3.4, +1.4) \\
+Missing $x_1^2$ term & Classical (6) & 0.960 & 0.955 & 2 & 1 & +0.5 ($-$1.2, +2.2) \\
+Wrong link (cloglog) & Full (14) & 0.270 & 0.280 & 3 & 5 & $-$1.0 ($-$3.8, +1.8) \\
+Wrong link (cloglog) & Classical (6) & 0.265 & 0.265 & 6 & 6 & +0.0 ($-$3.4, +3.4) \\
+Missing interaction & Full (14) & 0.945 & 0.975 & 0 & 6 & $-$3.0 ($-$5.4, $-$0.6) \\
+Missing interaction & Classical (6) & 0.945 & 0.960 & 2 & 5 & $-$1.5 ($-$4.1, +1.1) \\
 \bottomrule
 \end{tabular}

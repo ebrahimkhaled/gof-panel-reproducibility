@@ -4,6 +4,7 @@ the lettering stays at 7-9 pt. Colours: a validated categorical palette (colour-
 series also has its own marker and a direct label, so nothing depends on colour alone and the figures survive greyscale.
 Re-run after any change to the results."""
 import os
+from decimal import Decimal, ROUND_HALF_UP
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
@@ -33,6 +34,11 @@ NAME = {"HL": "Hosmer–Lemeshow", "HL-equalwidth": "HL, equal-width groups", "P
         "le-Cessie": "le Cessie–van Houwelingen", "A.poly": "Covariate, polynomial", "A.spline": "Covariate, spline"}
 
 
+def r2(v):
+    """Two-decimal label, rounded half up like the tables (0.355 -> 0.36)."""
+    return str(Decimal(repr(float(v))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+
+
 def save(fig, name):
     fig.savefig(os.path.join(OUT, name))
     plt.close(fig)
@@ -53,12 +59,16 @@ DEC = [("ANY", "Any test rejects", ORANGE, "o"), ("Cauchy", "Cauchy, analytic", 
 for ax, p in zip(axes, ["CLASSIC", "ONE-PER-GROUP", "FULL"]):
     g = s[s.panel == p].sort_values("n")
     nominal(ax)
-    for col, lab, c, m in DEC:
+    for col, lab, c, m in DEC[1:]:
         ax.plot(range(3), g[col], color=c, marker=m, label=lab, zorder=3)
+    for x, v in enumerate(g["ANY"]):
+        ax.annotate(r2(v), xy=(x, 0.108), xytext=(x, 0.094), ha="center", fontsize=6.5, color=ORANGE,
+                    arrowprops=dict(arrowstyle="->", color=ORANGE, lw=0.9))
     ax.set_xticks(range(3), ["200", "500", "1000"]); ax.set_xlabel("Sample size $n$")
-    ax.set_title(PANEL[p], loc="left"); ax.set_ylim(0, 0.32); ax.set_xlim(-0.25, 2.25)
+    ax.set_title(PANEL[p], loc="left"); ax.set_ylim(0, 0.11); ax.set_xlim(-0.25, 2.25)
 axes[0].set_ylabel("False-alarm rate")
 h, l = axes[0].get_legend_handles_labels()
+h.insert(0, mpl.lines.Line2D([], [], color=ORANGE, marker=r"$\uparrow$", ls="none", ms=6)); l.insert(0, "Any test rejects (off scale)")
 h.append(mpl.lines.Line2D([], [], color=MUTED, lw=0.8, ls=(0, (3, 2)))); l.append("nominal 0.05 ± 2 s.e.")
 fig.legend(h, l, loc="upper center", ncol=5, frameon=False, bbox_to_anchor=(0.5, 1.08), columnspacing=1.0, handlelength=1.8)
 save(fig, "fig1_size.pdf")
@@ -75,6 +85,10 @@ for ax, n in zip(axes, [200, 500, 1000]):
     ax.scatter(x[~above], y[~above], s=18, color=ORANGE, marker="s", edgecolor="white", lw=0.6, zorder=3,
                label="single test better")
     ax.set_title(f"$n={n}$", loc="left")
+    tied = int(((x >= 0.995) & (y >= 0.995)).sum())
+    if tied > 1:
+        ax.annotate(f"{tied} points\nat (1, 1)", xy=(1, 1), xytext=(0.62, 0.80), fontsize=6.5, color=INK, ha="center",
+                    arrowprops=dict(arrowstyle="->", color=MUTED, lw=0.7))
     ax.text(0.97, 0.05, f"{above.sum()} of {len(g)} on or\nabove the line", ha="right", va="bottom", transform=ax.transAxes,
             fontsize=7, color=INK)
     ax.set_xlim(0, 1.02); ax.set_ylim(0, 1.02); ax.set_aspect("equal")
@@ -96,7 +110,7 @@ im = ax.imshow(M, cmap="Blues", vmin=0, vmax=1)
 ax.grid(False)
 for i in range(len(order)):
     for j in range(len(order)):
-        ax.text(j, i, f"{M[i, j]:.2f}".lstrip("0") if round(M[i, j], 2) < 1 else "1", ha="center", va="center", fontsize=5.6,
+        ax.text(j, i, f"{M[i, j]:.2f}".lstrip("0") if round(M[i, j], 2) < 1 else ("1" if i == j else ">.99"), ha="center", va="center", fontsize=5.6,
                 color="white" if M[i, j] > 0.6 else INK)
 pos = 0
 for gr in GROUPS:
@@ -115,7 +129,7 @@ save(fig, "fig4_correlation.pdf")
 D = R("result5_diff.csv")
 RULES = [("HMP", "Harmonic mean $p$"), ("Fisher", "Fisher"), ("minP", "Minimum $p$"), ("Stouffer", "Stouffer"),
          ("Bonferroni", "Bonferroni, not calibrated"), ("Quadratic", "Quadratic $z^{\\top}S^{-1}z$")]
-LIM = (-9, 6)
+LIM = (-10.5, 6)
 fig, axes = plt.subplots(1, 2, figsize=(W, 2.4), sharey=True)
 for ax, p in zip(axes, ["CLASSIC", "FULL"]):
     ax.axvline(0, color=MUTED, lw=0.8)
@@ -132,7 +146,7 @@ for ax, p in zip(axes, ["CLASSIC", "FULL"]):
             ax.plot(v, yv, marker=m, color=c, mec="white", mew=0.6, ms=5,
                     label=f"$n={n}$" if i == 0 else None, ls="none")
     ax.set_yticks(range(len(RULES)), [lab for _, lab in RULES])
-    ax.set_xlim(*LIM); ax.set_xlabel("Power minus Cauchy combination (points)")
+    ax.set_xlim(*LIM); ax.set_xlabel("Difference from Cauchy (points)")
     ax.set_title(PANEL[p], loc="left"); ax.grid(axis="y", visible=False)
 axes[0].invert_yaxis()
 h, l = axes[0].get_legend_handles_labels()
@@ -224,9 +238,16 @@ for ax, d in zip(axes, ["rare", "six"]):
         wrong = col.endswith("wrong_design")
         ax.plot(range(2), g[col], color=c, marker=m, label=lab, zorder=3, ls=(0, (2, 1.5)) if wrong else "-",
                 mfc="white" if wrong else c)
+    # bootstrap from the fitted model (run_extra2.R), n = 200 only
+    if os.path.exists(os.path.join(HERE, "result7_boot_designs.csv")):
+        bd = R("result7_boot_designs.csv")
+        v = bd[(bd.design == d) & (bd.rule == "full_cauchy")]["size"]
+        if len(v):
+            ax.plot([0.1], v, ls="none", marker="*", ms=9, color=INK, mec="white", mew=0.5, zorder=4,
+                    label="Cauchy, bootstrap from the fitted model ($n=200$)")
     # the any-test rule is far off this scale: print its rates at the top, as Figure 3 does for off-scale values
     for x, v in enumerate(g["ANY"]):
-        ax.annotate(f"{v:.2f}", xy=(x, 0.108), xytext=(x, 0.094), ha="center", fontsize=6.5, color=ORANGE,
+        ax.annotate(r2(v), xy=(x, 0.108), xytext=(x, 0.094), ha="center", fontsize=6.5, color=ORANGE,
                     arrowprops=dict(arrowstyle="->", color=ORANGE, lw=0.9))
     ax.set_xticks(range(2), ["200", "500"]); ax.set_xlabel("Sample size $n$")
     ax.set_title(TITLE6[d], loc="left"); ax.set_ylim(0, 0.11); ax.set_xlim(-0.3, 1.3)

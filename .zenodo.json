@@ -1,8 +1,22 @@
 {
   "title": "Reproduction materials: from a panel of goodness-of-fit tests to one decision",
+  "version": "v1.0.1",
   "upload_type": "software",
-  "description": "Simulation code, stored per-data-set p-values of fourteen goodness-of-fit tests for logistic regression, and the analysis scripts that produce every table of the paper 'From a Panel of Goodness-of-Fit Tests to One Decision: Redundancy, the Limits of Learned Weights, and Robustness in Logistic Regression' and its supplementary material.",
-  "creators": [{"name": "Ebrahim, Ebrahim Khaled", "affiliation": "Alexandria University", "orcid": "0009-0006-7839-8778"}],
+  "description": "Simulation code, stored per-data-set p-values of fourteen goodness-of-fit tests for logistic regression, and the analysis scripts that produce every table and figure of the paper 'From a Panel of Goodness-of-Fit Tests to One Decision: Redundancy, the Limits of Learned Weights, and Robustness in Logistic Regression' and its supplementary material. Version 1.0.1 adds the bootstrap-calibration, extra null-design and extra recording-error simulations, the figure script, and corrects the R source paths so that the simulation scripts run from the root of the archive.",
+  "creators": [
+    {
+      "name": "Ebrahim, Ebrahim Khaled",
+      "affiliation": "Alexandria University",
+      "orcid": "0009-0006-7839-8778"
+    }
+  ],
   "license": "MIT",
-  "keywords": ["goodness of fit", "logistic regression", "Cauchy combination test", "multiple testing", "robustness", "simulation"]
+  "keywords": [
+    "goodness of fit",
+    "logistic regression",
+    "Cauchy combination test",
+    "multiple testing",
+    "robustness",
+    "simulation"
+  ]
 }

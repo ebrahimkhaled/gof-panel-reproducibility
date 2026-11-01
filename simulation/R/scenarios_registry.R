@@ -1,15 +1,15 @@
 # =============================================================================
-# scenarios_registry.R -- the pre-registered family sets (Evidence Plan sec. 2)
+# scenarios_registry.R -- the family sets fixed in advance (Evidence Plan sec. 2)
 # and one unified generator gen_scenario(scn, n) -> list(data, fit, formula).
 #
 # The 12 original families come UNCHANGED from learned-def/R/scenarios.R
 # (sourced, not copied -- guarantees identical DGPs). The 5 richer families are
 # ported verbatim from exp_richer_families.R. The 3 deployment families (D1-D3)
-# and the t8link all-fail family are NEW here, exactly as pre-registered in
+# and the t8link all-fail family are NEW here, exactly as fixed in advance in
 # 02_EVIDENCE_PLAN.md section 2.
 # =============================================================================
 
-# ---- family sets (pre-registered) -------------------------------------------
+# ---- family sets (fixed in advance) -------------------------------------------
 POOL_OLD12  <- c("quad", "quad2", "cubic", "cloglog", "probit", "bump", "sine",
                  "step", "interaction", "mixed", "multivar_quad", "multivar_int")
 POOL_NEW5   <- c("logabs", "threshx2", "dbump", "skewlink", "quadint_outlier")
@@ -57,7 +57,7 @@ gen_new <- function(scn, n = 500) {
   list(data = dat, fit = fit)
 }
 
-# ---- deployment set D1-D3 + t8link (NEW; pre-registered definitions) --------
+# ---- deployment set D1-D3 + t8link (NEW; definitions fixed in advance) --------
 gen_deploy <- function(scn, n = 500) {
   x1 <- runif(n, -3, 3); x2 <- rnorm(n)
   eta0 <- 0.3 + 0.8 * x1 - 0.5 * x2

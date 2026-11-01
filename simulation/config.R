@@ -7,7 +7,7 @@
 JASA <- new.env()
 
 JASA$base    <- "."
-JASA$study   <- file.path(JASA$base, "jasa_study")
+JASA$study   <- file.path(JASA$base, "simulation")
 JASA$results <- file.path(JASA$base, "results")
 JASA$stage1  <- file.path(JASA$results, "jasa_stage1")   # per-rep cheap-method p-values + seeds
 JASA$stage2  <- file.path(JASA$results, "jasa_stage2")   # per-rep meta p-values + summaries

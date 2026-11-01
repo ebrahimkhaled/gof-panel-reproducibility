@@ -1,0 +1,7 @@
+alternative,panel,reps,power_bootstrap,power_fixed_reference,agree
+quad,FULL,200,0.96,0.97,0.97
+quad,CLASSIC,200,0.96,0.955,0.985
+cloglog,FULL,200,0.27,0.28,0.96
+cloglog,CLASSIC,200,0.265,0.265,0.94
+interaction,FULL,200,0.945,0.975,0.97
+interaction,CLASSIC,200,0.945,0.96,0.965

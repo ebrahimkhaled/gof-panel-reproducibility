@@ -7,7 +7,7 @@
 ##       BAGofT's 427.7 s -- NOT milliseconds.
 ## Output: results/jasa_stage2/timing_frozen_n500.csv + printed medians.
 
-source("./jasa_study/config.R")
+source("simulation/config.R")
 source(file.path(JASA$study, "R", "methods_registry.R"))
 source(file.path(JASA$study, "R", "scenarios_registry.R"))
 source(file.path(JASA$study, "R", "harness_core.R"))

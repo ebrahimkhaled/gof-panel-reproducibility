@@ -143,4 +143,51 @@ if os.path.exists(os.path.join(HERE, "result5_power.csv")):
         "\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}",
         "Rule & Size & Power & Difference (95\\% CI) & Size & Power & Difference (95\\% CI) \\\\", "\\midrule",
         *rows[:-1], "\\bottomrule", "\\end{tabular}"]))
+# ---- Tables: the extra simulations of run_extra.R (result6_extra.py) ----------------------------------------------------
+if os.path.exists(os.path.join(HERE, "result6_designs.csv")):
+    C6, D6 = R("result6_corrupt.csv"), R("result6_designs.csv")
+    BS6, BP6 = R("result6_boot_size.csv"), R("result6_boot_power.csv")
+    # other corruption mechanisms: single tests and panels, k = 0, 1, 5, 10 for each mechanism
+    ks = [0, 1, 5, 10]
+    order = C6[(C6.mechanism == "x2") & (C6.k == 10)].iloc[0][list(TEST_NAME)].sort_values().index.tolist()
+    cell = lambda m, k, col: f3(C6[(C6.mechanism == m) & (C6.k == k)][col].iloc[0])
+    rows = [TEST_NAME[t] + " & " + " & ".join(cell(m, k, t) for m in ["flipy", "x2"] for k in ks) + " \\\\" for t in order]
+    rows.append("\\midrule")
+    rows += [f"Panel: {PANEL_NAME[p]} & " + " & ".join(cell(m, k, "panel:" + p) for m in ["flipy", "x2"] for k in ks) + " \\\\"
+             for p in ["FULL", "CLASSIC", "ONE-PER-GROUP", "PROTECTED"]]
+    kk = " & ".join(f"$k={k}$" for _ in range(2) for k in ks)
+    write("tab_extra_corrupt.tex", "\n".join([
+        "\\begin{tabular}{lcccccccc}", "\\toprule",
+        " & \\multicolumn{4}{c}{Flipped responses} & \\multicolumn{4}{c}{$x_2$ multiplied by 4} \\\\",
+        "\\cmidrule(lr){2-5}\\cmidrule(lr){6-9}", "Test & " + kk + " \\\\", "\\midrule",
+        *rows, "\\bottomrule", "\\end{tabular}"]))
+    # other null designs
+    DESIGN_NAME = {"rare": "Rare events", "six": "Six covariates"}
+    rows = []
+    for _, r in D6.iterrows():
+        rows.append(f"{DESIGN_NAME[r.design]} & {int(r.n)} & {PANEL_NAME[r.panel].split(' (')[0]} ({int(r.tests)}) & "
+                    f"{f3(r.ANY)} & {f3(r.Bonferroni)} & {f3(r.Cauchy)} & {f3(r['Cauchy-MC'])} & "
+                    f"{f3(r['Cauchy-MC_wrong_design'])} & {f3(r.single_min)}--{f3(r.single_max)} & {r.M_eff:.0f} \\\\")
+    write("tab_designs.tex", "\n".join([
+        "\\begin{tabular}{lrlccccccc}", "\\toprule",
+        " & & & & & \\multicolumn{3}{c}{Cauchy} & & \\\\", "\\cmidrule(lr){6-8}",
+        "Design & $n$ & Panel & Any test & Bonferroni & analytic & own design & original design & Single tests & $M_{\\mathrm{eff}}$ \\\\",
+        "\\midrule", *rows, "\\bottomrule", "\\end{tabular}"]))
+    # bootstrap calibration: size of four rules on two panels, and power against the fixed reference calibration
+    RN = {"cauchy": "Cauchy", "hmp": "Harmonic mean $p$", "fisher": "Fisher", "minp": "Minimum $p$"}
+    rows = []
+    for rule in RN:
+        cells = [f3(BS6[(BS6.n == n) & (BS6.rule == f"{p}_{rule}")]["size"].iloc[0]) for p in ["classic", "full"] for n in [200, 500]]
+        rows.append(RN[rule] + " & " + " & ".join(cells) + " \\\\")
+    write("tab_boot_size.tex", "\n".join([
+        "\\begin{tabular}{lcccc}", "\\toprule",
+        " & \\multicolumn{2}{c}{Classical (6)} & \\multicolumn{2}{c}{Full (14)} \\\\", "\\cmidrule(lr){2-3}\\cmidrule(lr){4-5}",
+        "Rule & $n=200$ & $n=500$ & $n=200$ & $n=500$ \\\\", "\\midrule", *rows, "\\bottomrule", "\\end{tabular}"]))
+    ALT_NAME = {"quad": "Missing quadratic term", "cloglog": "Wrong link (complementary log-log)", "interaction": "Missing interaction"}
+    rows = [f"{ALT_NAME[r.alternative]} & {PANEL_NAME[r.panel]} & {f3(r.power_bootstrap)} & {f3(r.power_fixed_reference)} & "
+            f"{f3(r.agree)} \\\\" for _, r in BP6.iterrows()]
+    write("tab_boot_power.tex", "\n".join([
+        "\\begin{tabular}{llccc}", "\\toprule",
+        "Alternative & Panel & Bootstrap & Fixed reference & Same decision \\\\", "\\midrule",
+        *rows, "\\bottomrule", "\\end{tabular}"]))
 print("tables written to", OUT, ":", sorted(os.listdir(OUT)))

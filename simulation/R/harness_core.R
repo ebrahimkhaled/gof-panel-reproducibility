@@ -16,7 +16,7 @@ jasa_init <- function() {
   if (!exists("JASA", mode = "environment"))
     stop("source config.R before harness_core.R")
   for (f in JASA$pkg_files) source(file.path(JASA$pkg_tree, "R", f))
-  source(file.path(JASA$base, "R", "scenarios.R"))           # original 12 DGPs
+  source(file.path(JASA$study, "R", "scenarios.R"))           # original 12 DGPs
   source(file.path(JASA$study, "R", "scenarios_registry.R"))
   source(file.path(JASA$study, "R", "methods_registry.R"))
   invisible(TRUE)

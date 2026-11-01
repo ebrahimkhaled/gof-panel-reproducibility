@@ -1,7 +1,7 @@
 ## =============================================================================
 ## select_final_heldout.R -- FINAL SELECT PHASE (2026-08-07)
 ##
-## ONE rule, pre-registered in results/jasa_stage2/SELECTION_PREREG.md BEFORE
+## ONE rule, written down in results/jasa_stage2/SELECTION_PREREG.md BEFORE
 ## this script was written, is evaluated ONCE on the held-out test_* families.
 ##
 ## SELECTED RULE: NNCauchy (nested-CV, select=mean)

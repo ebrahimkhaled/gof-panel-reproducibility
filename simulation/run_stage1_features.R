@@ -14,7 +14,7 @@
 #        JASA_SMOKE=1 Rscript run_stage1_features.R   (tiny)
 # =============================================================================
 
-source("./jasa_study/config.R")
+source("simulation/config.R")
 source(file.path(JASA$study, "R", "harness_core.R"))
 jasa_init()
 commit <- check_pinned_commit()

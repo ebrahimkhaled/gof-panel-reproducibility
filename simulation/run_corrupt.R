@@ -9,7 +9,7 @@
 args <- commandArgs(trailingOnly = TRUE)
 SMOKE <- length(args) && args[1] == "smoke"
 HERE <- "./legoft_panel"
-source("./jasa_study/config.R")
+source("simulation/config.R")
 JASA$pkg_tree <- "package_2.4.1_27d5ef2"
 source(file.path(JASA$study, "R", "harness_core.R"))
 

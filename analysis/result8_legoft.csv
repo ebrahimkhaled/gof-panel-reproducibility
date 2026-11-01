@@ -1,0 +1,5 @@
+n,rule,size,power,alternatives,corrupt_k0,corrupt_k1,corrupt_k5,corrupt_k10
+500,LEGofT (frozen weights),0.055,0.5294347826086956,23,0.038,0.137,0.425,0.64
+500,Equal weights,0.0445,0.5192173913043479,23,0.027,0.132,0.417,0.64
+1000,LEGofT (frozen weights),0.0485,0.6276956521739131,23,0.054,0.145,0.398,0.632
+1000,Equal weights,0.051,0.639695652173913,23,0.058,0.149,0.402,0.624

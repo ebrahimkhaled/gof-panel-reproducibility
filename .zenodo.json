@@ -1,8 +1,8 @@
 {
   "title": "Reproduction materials: from a panel of goodness-of-fit tests to one decision",
-  "version": "v1.0.2",
+  "version": "v1.0.3",
   "upload_type": "software",
-  "description": "Simulation code, stored per-data-set p-values of fourteen goodness-of-fit tests for logistic regression, and the analysis scripts that produce every table and figure of the paper 'From a Panel of Goodness-of-Fit Tests to One Decision: Redundancy, the Limits of Learned Weights, and Robustness in Logistic Regression' and its supplementary material. Version 1.0.1 adds the bootstrap-calibration, extra null-design and extra recording-error simulations, the figure script, and corrects the R source paths so that the simulation scripts run from the root of the archive. Version 1.0.2 adds the bootstrap calibration in the two further null designs and the paired comparison of bootstrap and fixed-reference power at n = 200 (simulation/run_extra2.R, analysis/result7_extra2.py).",
+  "description": "Simulation code, stored per-data-set p-values of fourteen goodness-of-fit tests for logistic regression, and the analysis scripts that produce every table and figure of the paper 'From a Panel of Goodness-of-Fit Tests to One Decision: Redundancy, the Limits of Learned Weights, and Robustness in Logistic Regression' and its supplementary material. Version 1.0.1 adds the bootstrap-calibration, extra null-design and extra recording-error simulations, the figure script, and corrects the R source paths so that the simulation scripts run from the root of the archive. Version 1.0.2 adds the bootstrap calibration in the two further null designs and the paired comparison of bootstrap and fixed-reference power at n = 200 (simulation/run_extra2.R, analysis/result7_extra2.py). Version 1.0.3 adds the analysis of the shipped LEGofT weights and the package source in which legoft() runs every panel and combination rule of the paper.",
   "creators": [
     {
       "name": "Ebrahim, Ebrahim Khaled",
